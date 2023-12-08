@@ -7,4 +7,4 @@
 
 ### API
 
-see [WayTodayClient](main/src/main/java/solutions/s4y/waytoday/sdk/WayTodayClient.java)
+see [WayTodayClient](src/main/java/solutions/s4y/waytoday/sdk/WayTodayClient.java)
