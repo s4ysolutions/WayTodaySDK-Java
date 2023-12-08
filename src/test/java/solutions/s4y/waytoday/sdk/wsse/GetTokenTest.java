@@ -1,4 +1,4 @@
-package s4y.solutions.waytoday.sdk.wsse;
+package solutions.s4y.waytoday.sdk.wsse;
 
 import org.junit.jupiter.api.Test;
 

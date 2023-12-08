@@ -1,4 +1,4 @@
-package s4y.solutions.waytoday.sdk.wsse;
+package solutions.s4y.waytoday.sdk.wsse;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
