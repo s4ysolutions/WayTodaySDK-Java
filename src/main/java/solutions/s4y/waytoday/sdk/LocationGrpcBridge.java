@@ -20,7 +20,7 @@ class LocationGrpcBridge {
                 location.getSid()
         );
     }
-    static LocationOuterClass.Location toProto(Location location) {
+    static LocationOuterClass.Location toProto(Location location, String provider){
         return LocationOuterClass.Location.newBuilder()
                 .setID(location.id)
                 .setTid(location.tid)
@@ -31,7 +31,7 @@ class LocationGrpcBridge {
                 .setTs(location.ts)
                 .setBatp(location.batp)
                 .setBats(location.bats)
-                .setProvider(location.provider)
+                .setProvider(location.provider.isEmpty() ? provider : location.provider)
                 .setSpeed(location.speed)
                 .setAcc(location.acc)
                 .setSid(location.sid)

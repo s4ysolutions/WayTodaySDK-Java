@@ -29,7 +29,7 @@ class GrpcClient {
         }
     }
 
-    static private Logger logger = org.slf4j.LoggerFactory.getLogger(GrpcClient.class);
+    static private final Logger logger = org.slf4j.LoggerFactory.getLogger(GrpcClient.class);
 
     // TODO: should be annotation
     @Nonnull
@@ -55,6 +55,7 @@ class GrpcClient {
     private final boolean tls;
     private final String host;
     private final int port;
+    @SuppressWarnings("FieldCanBeLocal")
     private final String provider;
 
     /**
@@ -191,7 +192,7 @@ class GrpcClient {
                 .newBuilder()
                 .setTid(tid);
         for (Location location : locations) {
-            reqBuilder.addLocations(LocationGrpcBridge.toProto(location));
+            reqBuilder.addLocations(LocationGrpcBridge.toProto(location, provider));
         }
 
         final TrackerOuterClass.AddLocationsRequest req = reqBuilder.build();

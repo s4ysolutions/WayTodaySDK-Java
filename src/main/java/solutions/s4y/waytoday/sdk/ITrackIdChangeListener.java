@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Interface for listening to track ID changes
- *
  * Used for asynchronous track ID retrieval
  */
 @FunctionalInterface
