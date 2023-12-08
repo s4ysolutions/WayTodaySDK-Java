@@ -117,7 +117,7 @@ class GrpcClient {
         }
     }
 
-    public String generateTrackerID(@Nullable String prevId) throws Exception {
+    public String generateTrackerId(@Nullable String prevId) throws Exception {
         final TrackerOuterClass.GenerateTrackerIDRequest.Builder reqBuilder = TrackerOuterClass
                 .GenerateTrackerIDRequest
                 .newBuilder();
@@ -134,11 +134,11 @@ class GrpcClient {
             return response.getTid();
         }
     }
-    public String generateTrackerID() throws Exception {
-       return generateTrackerID(null);
+    public String generateTrackerId() throws Exception {
+       return generateTrackerId(null);
     }
 
-    public Boolean testTrackerID(@Nonnull String tid) throws Exception {
+    public Boolean testTrackerId(@Nonnull String tid) throws Exception {
         final TrackerOuterClass.TestTrackerIDRequest.Builder reqBuilder = TrackerOuterClass
                 .TestTrackerIDRequest
                 .newBuilder()
@@ -153,7 +153,7 @@ class GrpcClient {
         }
     }
 
-    public Boolean freeTrackerID(@Nonnull String tid) throws Exception {
+    public Boolean freeTrackerId(@Nonnull String tid) throws Exception {
         final TrackerOuterClass.FreeTrackerIDRequest.Builder reqBuilder = TrackerOuterClass
                 .FreeTrackerIDRequest
                 .newBuilder()

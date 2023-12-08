@@ -137,9 +137,9 @@ public class WayTodayClient {
      * @param prevId - existing track id to be released
      * @return new track id or empty string if the request failed
      */
-    public String requestNewTrackerID(@Nullable String prevId) {
+    public String requestNewTrackerId(@Nullable String prevId) {
         try {
-            String id = grpcClient.generateTrackerID(prevId);
+            String id = grpcClient.generateTrackerId(prevId);
             persistedState.setTrackerId(id);
             notifyTrackIdChange(id);
             return id;
@@ -214,13 +214,13 @@ public class WayTodayClient {
         return UploadingLocationsStatus.EMPTY;
     }
 
-    private void notifyTrackIdChange(@Nonnull String trackID) {
+    private void notifyTrackIdChange(@Nonnull String trackId) {
         List<ITrackIdChangeListener> listeners;
         synchronized (trackIdChangeListeners) {
             listeners = new ArrayList<>(trackIdChangeListeners);
         }
         for (ITrackIdChangeListener listener : listeners) {
-            listener.onTrackID(trackID);
+            listener.onTrackId(trackId);
         }
     }
 

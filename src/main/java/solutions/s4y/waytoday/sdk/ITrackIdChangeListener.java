@@ -9,5 +9,5 @@ import javax.annotation.Nonnull;
  */
 @FunctionalInterface
 public interface ITrackIdChangeListener {
-    void onTrackID(@Nonnull String trackID);
+    void onTrackId(@Nonnull String trackID);
 }

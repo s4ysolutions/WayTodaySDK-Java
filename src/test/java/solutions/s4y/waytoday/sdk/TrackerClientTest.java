@@ -42,7 +42,7 @@ public class TrackerClientTest {
         void generateTrackerID_shouldReturnGeneratedTrackerID() throws Exception {
             // Arrange
             // Act
-            String trackerID = client.generateTrackerID();
+            String trackerID = client.generateTrackerId();
             // Assert
             assertThat(trackerID).isNotEmpty();
         }
@@ -84,7 +84,7 @@ public class TrackerClientTest {
         void testTrackerID_shouldReturnTrue() throws Exception {
             // Arrange
             // Act
-            Boolean ok = client.testTrackerID("non-existing-tracker-id");
+            Boolean ok = client.testTrackerId("non-existing-tracker-id");
             // Assert
             // TODO: This should return false
             assertThat(ok).isTrue();
@@ -98,7 +98,7 @@ public class TrackerClientTest {
         void freeTrackerID_shouldReturnTrue() throws Exception {
             // Arrange
             // Act
-            Boolean ok = client.freeTrackerID("non-existing-tracker-id");
+            Boolean ok = client.freeTrackerId("non-existing-tracker-id");
             // Assert
             // NOTE: false means that the tracker id already was freed and in the pool
             assertThat(ok).isNotNull();
@@ -111,7 +111,7 @@ public class TrackerClientTest {
         @Test
         void locations_shouldBeEmpty() throws Exception {
             // Arrange
-            client.freeTrackerID("test_locations_shouldBeEmpty");
+            client.freeTrackerId("test_locations_shouldBeEmpty");
             Thread.sleep(1000);
             // Act
             List<Location> locations = client.getLocations("test_locations_shouldBeEmpty", 1);
@@ -122,7 +122,7 @@ public class TrackerClientTest {
         @Test
         void locations_shouldBeAdded() throws Exception {
             // Arrange
-            client.freeTrackerID("test_locations_shouldBeAdded");
+            client.freeTrackerId("test_locations_shouldBeAdded");
             Thread.sleep(1000);
             List<Location> locations = new ArrayList<>();
             locations.add(new Location("id1", "", 0, 0, 0, 0, 0, 0, false, "provider", 0, 0, "sid1"));
