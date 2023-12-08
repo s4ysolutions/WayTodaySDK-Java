@@ -3,6 +3,7 @@ package solutions.s4y.waytoday.sdk;
 import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class WayTodayClientAsync extends WayTodayClient{
     ExecutorService executor = Executors.newCachedThreadPool();
@@ -10,7 +11,11 @@ public class WayTodayClientAsync extends WayTodayClient{
         super(persistedState);
     }
 
-    public String requestNewTrackerId(@Nullable String prevId) {
+    public Future<String> submitRequestNewTrackerId(@Nullable String prevId) {
+        return executor.submit(() -> requestNewTrackerId(prevId));
+    }
 
+    public void submitUploadLocations() {
+        executor.execute(this::uploadLocations);
     }
 }
