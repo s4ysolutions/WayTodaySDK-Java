@@ -28,11 +28,11 @@ public class WayTodayClient {
             new ArrayList<>(2);
     final ArrayList<ITrackIdChangeListener> trackIdChangeListeners =
             new ArrayList<>(2);
-    final List<IUploadingLocationsStatusChangeListener> uploadLocationsStatusChangeListeners =
+    final List<IUploadingLocationsStatusChangeListener> uploadingLocationsStatusChangeListeners =
             new ArrayList<>(2);
-    private final Deque<Location> locationsQueue = new LinkedList<>();
-    private final static int MAX_LOCATIONS_MEMORY = 500;
-    private final static int PACK_SIZE = 16;
+    final Deque<Location> locationsQueue = new LinkedList<>();
+    final static int MAX_LOCATIONS_MEMORY = 500;
+    final static int PACK_SIZE = 16;
     protected Logger logger = LoggerFactory.getLogger(WayTodayClient.class);
 
     /**
@@ -86,9 +86,9 @@ public class WayTodayClient {
      * @param listener an implementation of {@link IUploadingLocationsStatusChangeListener}
      */
 
-    public void addUploadLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
-        synchronized (uploadLocationsStatusChangeListeners) {
-            uploadLocationsStatusChangeListeners.add(listener);
+    public void addUploadingLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
+        synchronized (uploadingLocationsStatusChangeListeners) {
+            uploadingLocationsStatusChangeListeners.add(listener);
         }
     }
 
@@ -97,12 +97,12 @@ public class WayTodayClient {
      * Unsubscribe the listener from changes of the uploading locations status.
      *
      * @param listener an implementation of {@link IUploadingLocationsStatusChangeListener}
-     *                 used in the previous call of {@link #addUploadLocationsStatusChangeListener addUploadStatusChangeListener}
+     *                 used in the previous call of {@link #addUploadingLocationsStatusChangeListener addUploadStatusChangeListener}
      */
 
-    public void removeUploadLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
-        synchronized (uploadLocationsStatusChangeListeners) {
-            uploadLocationsStatusChangeListeners.remove(listener);
+    public void removeUploadingLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
+        synchronized (uploadingLocationsStatusChangeListeners) {
+            uploadingLocationsStatusChangeListeners.remove(listener);
         }
     }
 
@@ -255,8 +255,8 @@ public class WayTodayClient {
          */
         UploadingLocationsStatus status = getUploadingLocationsStatus();
         List<IUploadingLocationsStatusChangeListener> listeners;
-        synchronized (uploadLocationsStatusChangeListeners) {
-            listeners = new ArrayList<>(uploadLocationsStatusChangeListeners);
+        synchronized (uploadingLocationsStatusChangeListeners) {
+            listeners = new ArrayList<>(uploadingLocationsStatusChangeListeners);
         }
         for (IUploadingLocationsStatusChangeListener listener : listeners) {
             listener.onStatusChange(status);
@@ -311,17 +311,5 @@ public class WayTodayClient {
         for (IErrorsListener listener : listeners) {
             listener.onError(error);
         }
-    }
-
-    static int testGetMaxLocations() {
-        return MAX_LOCATIONS_MEMORY;
-    }
-
-    static int testGetPackSize() {
-        return PACK_SIZE;
-    }
-
-    Deque<Location> testLocationsQueue() {
-        return locationsQueue;
     }
 }

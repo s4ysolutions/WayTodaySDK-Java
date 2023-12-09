@@ -1,7 +1,5 @@
 package solutions.s4y.waytoday.sdk;
 
-import solutions.s4y.waytoday.grpc.LocationOuterClass;
-
 /**
  * A class to represent a location to be uploaded to the WayToday service
  */
@@ -19,6 +17,7 @@ public class Location {
     public final long speed;
     public final long acc;
     public final String sid;
+    @SuppressWarnings("unused")
     public Location(String tid, long lat, long lon, long alt, long bear, long ts, long batp, boolean bats, String provider, long speed, long acc) {
         this.id = "";
         this.tid = tid;
@@ -36,6 +35,7 @@ public class Location {
         this.sid = "";
     }
 
+    @SuppressWarnings("unused")
     public Location(String id, String tid, long lat, long lon, long alt, long bear, long ts, long batp, boolean bats, String provider, long speed, long acc) {
         this.id = id;
         this.tid = tid;

@@ -69,6 +69,66 @@ public class WayTodayClientTest {
             client.removeOnTrackIdChangeListener(l2);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(0);
         }
+        @Test
+        public void uploadLocationsStatusChangeListeners_canBeAddedAndRemovedOneTime() {
+            assertThat(client.uploadingLocationsStatusChangeListeners).isEmpty();
+            IUploadingLocationsStatusChangeListener l = trackID -> {
+            };
+
+            client.addUploadingLocationsStatusChangeListener(l);
+            assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(1);
+            client.removeUploadingLocationsStatusChangeListener(l);
+            assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(0);
+        }
+
+        @Test
+        public void uploadLocationsStatusChangeListeners_canBeAddedAndRemovedMultipleTimes() {
+            assertThat(client.uploadingLocationsStatusChangeListeners).isEmpty();
+            IUploadingLocationsStatusChangeListener l1 = status -> {
+            };
+            IUploadingLocationsStatusChangeListener l2 = status -> {
+            };
+
+            client.addUploadingLocationsStatusChangeListener(l1);
+            client.addUploadingLocationsStatusChangeListener(l2);
+            assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(2);
+            client.removeUploadingLocationsStatusChangeListener(l1);
+            assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(1);
+            client.removeUploadingLocationsStatusChangeListener(l1);
+            assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(1);
+            client.removeUploadingLocationsStatusChangeListener(l2);
+            assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(0);
+        }
+        @Test
+        public void errorListeners_canBeAddedAndRemovedOneTime() {
+            assertThat(client.errorsListeners).isEmpty();
+            IErrorsListener l = trackID -> {
+            };
+
+            client.addErrorsListener(l);
+            assertThat(client.errorsListeners.size()).isEqualTo(1);
+            client.removeErrorsListener(l);
+            assertThat(client.errorsListeners.size()).isEqualTo(0);
+        }
+
+        @Test
+        public void errorListeners_canBeAddedAndRemovedMultipleTimes() {
+            assertThat(client.errorsListeners).isEmpty();
+            IErrorsListener l1 = error -> {
+            };
+            IErrorsListener l2 = error -> {
+            };
+
+            client.addErrorsListener(l1);
+            client.addErrorsListener(l2);
+            assertThat(client.errorsListeners.size()).isEqualTo(2);
+            client.removeErrorsListener(l1);
+            assertThat(client.errorsListeners.size()).isEqualTo(1);
+            client.removeErrorsListener(l1);
+            assertThat(client.errorsListeners.size()).isEqualTo(1);
+            client.removeErrorsListener(l2);
+            assertThat(client.errorsListeners.size()).isEqualTo(0);
+        }
 
         @Test
         public void getTrackerId_shouldGetFromState() {
@@ -115,16 +175,16 @@ public class WayTodayClientTest {
             final String secondId = "second";
             client.enqueueLocationToUpload(getDummyLocation(firstId));
             client.enqueueLocationToUpload(getDummyLocation(secondId));
-            for (int i = 2; i < WayTodayClient.testGetMaxLocations(); i++) {
+            for (int i = 2; i < WayTodayClient.MAX_LOCATIONS_MEMORY; i++) {
                 client.enqueueLocationToUpload(Locations.dummyLocation);
             }
-            assert (client.testLocationsQueue().size() == WayTodayClient.testGetMaxLocations());
+            assert (client.locationsQueue.size() == WayTodayClient.MAX_LOCATIONS_MEMORY);
             // Act
             final String lastId = "last";
             client.enqueueLocationToUpload(getDummyLocation(lastId));
             // Assert
-            Deque<Location> queue = client.testLocationsQueue();
-            assertThat(queue.size()).isEqualTo(WayTodayClient.testGetMaxLocations());
+            Deque<Location> queue = client.locationsQueue;
+            assertThat(queue.size()).isEqualTo(WayTodayClient.MAX_LOCATIONS_MEMORY);
             assertThat(queue.getFirst().id).isEqualTo(secondId);
             assertThat(queue.getLast().id).isEqualTo(lastId);
             assertThat(queue.contains(getDummyLocation(firstId))).isFalse();
@@ -133,7 +193,7 @@ public class WayTodayClientTest {
         @Test
         public void uploadLocations_shouldClearQueueLessThanPackSize() throws Exception {
             // Arrange
-            for (int i = 0; i < WayTodayClient.testGetPackSize() - 1; i++) {
+            for (int i = 0; i < WayTodayClient.PACK_SIZE - 1; i++) {
                 client.enqueueLocationToUpload(Locations.dummyLocation);
             }
             final String trackId = "test_uploadLocations";
@@ -148,16 +208,16 @@ public class WayTodayClientTest {
             // Act
             client.uploadLocations();
             // Assert
-            assertThat(client.testLocationsQueue()).isEmpty();
+            assertThat(client.locationsQueue).isEmpty();
             assertThat(client.getUploadingLocationsStatus()).isEqualTo(UploadingLocationsStatus.EMPTY);
             verify(grpcClient).addLocations(eq(trackId), any());
-            assertThat(pack.size()).isEqualTo(WayTodayClient.testGetPackSize() - 1);
+            assertThat(pack.size()).isEqualTo(WayTodayClient.PACK_SIZE - 1);
         }
 
         @Test
         public void uploadLocations_shouldClearQueueMoreThanPackSize() throws Exception {
             // Arrange
-            for (int i = 0; i < WayTodayClient.testGetPackSize() * 2 - 1; i++) {
+            for (int i = 0; i < WayTodayClient.PACK_SIZE * 2 - 1; i++) {
                 client.enqueueLocationToUpload(Locations.dummyLocation);
             }
             final String trackId = "test_uploadLocations2";
@@ -172,12 +232,12 @@ public class WayTodayClientTest {
             // Act
             client.uploadLocations();
             // Assert
-            assertThat(client.testLocationsQueue()).isEmpty();
+            assertThat(client.locationsQueue).isEmpty();
             assertThat(client.getUploadingLocationsStatus()).isEqualTo(UploadingLocationsStatus.EMPTY);
             verify(grpcClient, times(2)).addLocations(eq(trackId), any());
             assertThat(packs.size()).isEqualTo(2);
-            assertThat(packs.get(0).size()).isEqualTo(WayTodayClient.testGetPackSize());
-            assertThat(packs.get(1).size()).isEqualTo(WayTodayClient.testGetPackSize() - 1);
+            assertThat(packs.get(0).size()).isEqualTo(WayTodayClient.PACK_SIZE);
+            assertThat(packs.get(1).size()).isEqualTo(WayTodayClient.PACK_SIZE - 1);
         }
 
         @Test
