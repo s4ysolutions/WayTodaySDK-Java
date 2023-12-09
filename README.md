@@ -7,4 +7,10 @@
 
 ### API
 
-see [WayTodayClient](src/main/java/solutions/s4y/waytoday/sdk/WayTodayClient.java)
+See [WayTodayClient](src/main/java/solutions/s4y/waytoday/sdk/WayTodayClient.java)
+
+### Build & Test
+
+`mvn verify`
+
+artefact location: target/waytoday-sdk-java-[version].jar

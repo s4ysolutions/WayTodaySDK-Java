@@ -1,8 +1,5 @@
 package solutions.s4y.waytoday.sdk;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The main class of the SDK providing the API to the WayToday service
+ * All the calls are synchronous
  * <p>
  * The API consists of two parts:
  * 1. The methods to request and release a tracking id(trackId).
@@ -33,7 +31,6 @@ public class WayTodayClient {
     final Deque<Location> locationsQueue = new LinkedList<>();
     final static int MAX_LOCATIONS_MEMORY = 500;
     final static int PACK_SIZE = 16;
-    protected Logger logger = LoggerFactory.getLogger(WayTodayClient.class);
 
     /**
      * Creates an instance of the client, intended to be used in tests only.
@@ -144,7 +141,6 @@ public class WayTodayClient {
             notifyTrackIdChange(id);
             return id;
         } catch (Exception e) {
-            logger.error("Error while requesting new tracker id", e);
             notifyError(new WayTodayError("Error while requesting new tracker id", e));
             return "";
         }
@@ -190,7 +186,6 @@ public class WayTodayClient {
             uploadQueue(tid);
         } catch (Exception e) {
             isError.set(true);
-            notifyUploadLocationsState();
         } finally {
             isUploading.set(false);
             notifyUploadLocationsState();
@@ -294,7 +289,6 @@ public class WayTodayClient {
                 }
             } catch (Exception e) {
                 // network error
-                logger.error("Error while uploading locations", e);
                 notifyError(new WayTodayError("Error while uploading locations", e));
                 isError.set(true);
                 break;

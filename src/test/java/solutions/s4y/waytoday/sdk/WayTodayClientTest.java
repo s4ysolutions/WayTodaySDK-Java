@@ -17,7 +17,7 @@ import static solutions.s4y.waytoday.sdk.WayTodayClientTest.Locations.getDummyLo
 
 public class WayTodayClientTest {
     static class Locations {
-        static Location dummyLocation = new Location("", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
+        final static Location dummyLocation = new Location("", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
 
         static Location getDummyLocation(String id) {
             return new Location(id, "", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
@@ -26,19 +26,28 @@ public class WayTodayClientTest {
 
     private WayTodayClient client;
     private final IPersistedState state = mock();
+    private final IErrorsListener errorsListener = mock();
 
     @BeforeEach
     public void setUp() {
         client = new WayTodayClient(state);
+        client.addErrorsListener(errorsListener);
     }
 
+    @AfterEach
     public void tearDown() {
         reset(state);
+        reset(errorsListener);
     }
 
     @Nested
     @DisplayName("No gRPC calls")
     public class NoGrpcCallsTest {
+        @BeforeEach
+        public void setUp() {
+            client.removeErrorsListener(errorsListener);
+        }
+
         @Test
         public void trackIdChangeListeners_canBeAddedAndRemovedOneTime() {
             assertThat(client.trackIdChangeListeners).isEmpty();
@@ -49,6 +58,7 @@ public class WayTodayClientTest {
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(1);
             client.removeOnTrackIdChangeListener(l);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(0);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -68,7 +78,9 @@ public class WayTodayClientTest {
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(1);
             client.removeOnTrackIdChangeListener(l2);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(0);
+            verify(errorsListener, never()).onError(any());
         }
+
         @Test
         public void uploadLocationsStatusChangeListeners_canBeAddedAndRemovedOneTime() {
             assertThat(client.uploadingLocationsStatusChangeListeners).isEmpty();
@@ -79,6 +91,7 @@ public class WayTodayClientTest {
             assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(1);
             client.removeUploadingLocationsStatusChangeListener(l);
             assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(0);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -98,7 +111,9 @@ public class WayTodayClientTest {
             assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(1);
             client.removeUploadingLocationsStatusChangeListener(l2);
             assertThat(client.uploadingLocationsStatusChangeListeners.size()).isEqualTo(0);
+            verify(errorsListener, never()).onError(any());
         }
+
         @Test
         public void errorListeners_canBeAddedAndRemovedOneTime() {
             assertThat(client.errorsListeners).isEmpty();
@@ -109,6 +124,7 @@ public class WayTodayClientTest {
             assertThat(client.errorsListeners.size()).isEqualTo(1);
             client.removeErrorsListener(l);
             assertThat(client.errorsListeners.size()).isEqualTo(0);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -128,6 +144,7 @@ public class WayTodayClientTest {
             assertThat(client.errorsListeners.size()).isEqualTo(1);
             client.removeErrorsListener(l2);
             assertThat(client.errorsListeners.size()).isEqualTo(0);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -139,15 +156,16 @@ public class WayTodayClientTest {
             // Assert
             assertThat(trackId).isEqualTo("test");
             verify(state).getTrackerId();
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
         public void getUploadingLocationsStatus_shouldBeEmptyInitially() {
             // Assert
             assertThat(client.getUploadingLocationsStatus()).isEqualTo(UploadingLocationsStatus.EMPTY);
+            verify(errorsListener, never()).onError(any());
         }
     }
-
 
     @Nested
     @DisplayName("Mocked gRPC calls")
@@ -166,6 +184,7 @@ public class WayTodayClientTest {
             client.enqueueLocationToUpload(Locations.dummyLocation);
             // Assert
             assertThat(client.getUploadingLocationsStatus()).isEqualTo(UploadingLocationsStatus.QUEUED);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -188,6 +207,7 @@ public class WayTodayClientTest {
             assertThat(queue.getFirst().id).isEqualTo(secondId);
             assertThat(queue.getLast().id).isEqualTo(lastId);
             assertThat(queue.contains(getDummyLocation(firstId))).isFalse();
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -212,6 +232,7 @@ public class WayTodayClientTest {
             assertThat(client.getUploadingLocationsStatus()).isEqualTo(UploadingLocationsStatus.EMPTY);
             verify(grpcClient).addLocations(eq(trackId), any());
             assertThat(pack.size()).isEqualTo(WayTodayClient.PACK_SIZE - 1);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -238,6 +259,7 @@ public class WayTodayClientTest {
             assertThat(packs.size()).isEqualTo(2);
             assertThat(packs.get(0).size()).isEqualTo(WayTodayClient.PACK_SIZE);
             assertThat(packs.get(1).size()).isEqualTo(WayTodayClient.PACK_SIZE - 1);
+            verify(errorsListener, never()).onError(any());
         }
 
         @Test
@@ -246,6 +268,7 @@ public class WayTodayClientTest {
             client.enqueueLocationToUpload(Locations.dummyLocation);
             // Assert
             assertThat(client.getUploadingLocationsStatus()).isEqualTo(UploadingLocationsStatus.QUEUED);
+            verify(errorsListener, never()).onError(any());
         }
 
         @ParameterizedTest
@@ -259,6 +282,7 @@ public class WayTodayClientTest {
             // Assert
             assertThat(trackId).isEqualTo("test");
             verify(grpcClient).generateTrackerId(argThat(some -> true));
+            verify(errorsListener, never()).onError(any());
         }
 
         @ParameterizedTest
@@ -271,6 +295,7 @@ public class WayTodayClientTest {
             String trackId = client.requestNewTrackerId(prevId);
             // Assert
             verify(state).setTrackerId(trackId);
+            verify(errorsListener, never()).onError(any());
         }
 
         @AfterEach

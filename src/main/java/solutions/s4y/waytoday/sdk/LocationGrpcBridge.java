@@ -2,6 +2,9 @@ package solutions.s4y.waytoday.sdk;
 
 import solutions.s4y.waytoday.grpc.LocationOuterClass;
 
+/**
+ * Utility class to convert between Location and LocationOuterClass.Location
+ */
 class LocationGrpcBridge {
     static Location fromProto(LocationOuterClass.Location location) {
         return new Location(

@@ -4,7 +4,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import org.slf4j.Logger;
 import solutions.s4y.waytoday.sdk.wsse.Wsse;
 import solutions.s4y.waytoday.grpc.TrackerGrpc;
 import solutions.s4y.waytoday.grpc.TrackerOuterClass;
@@ -29,8 +28,6 @@ class GrpcClient {
         }
     }
 
-    static private final Logger logger = org.slf4j.LoggerFactory.getLogger(GrpcClient.class);
-
     // TODO: should be annotation
     @Nonnull
     static String readStartArgument(@Nonnull String name, @Nullable String def) {
@@ -42,7 +39,7 @@ class GrpcClient {
             return value;
         if (def != null)
             return def;
-        logger.error("Missing required argument: " + name);
+        // logger.error("Missing required argument: " + name);
         return "";
     }
     static String readStartArgument(@Nonnull String name) {
@@ -55,7 +52,6 @@ class GrpcClient {
     private final boolean tls;
     private final String host;
     private final int port;
-    @SuppressWarnings("FieldCanBeLocal")
     private final String provider;
 
     /**
