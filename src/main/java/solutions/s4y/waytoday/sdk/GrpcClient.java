@@ -55,7 +55,6 @@ class GrpcClient {
     private final boolean tls;
     private final String host;
     private final int port;
-    @SuppressWarnings("FieldCanBeLocal")
     private final String provider;
 
     /**

@@ -33,7 +33,7 @@ public class WayTodayClient {
     final Deque<Location> locationsQueue = new LinkedList<>();
     final static int MAX_LOCATIONS_MEMORY = 500;
     final static int PACK_SIZE = 16;
-    protected Logger logger = LoggerFactory.getLogger(WayTodayClient.class);
+    final protected Logger logger = LoggerFactory.getLogger(WayTodayClient.class);
 
     /**
      * Creates an instance of the client, intended to be used in tests only.
@@ -190,7 +190,6 @@ public class WayTodayClient {
             uploadQueue(tid);
         } catch (Exception e) {
             isError.set(true);
-            notifyUploadLocationsState();
         } finally {
             isUploading.set(false);
             notifyUploadLocationsState();

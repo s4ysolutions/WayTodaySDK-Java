@@ -20,7 +20,7 @@ public class Wsse {
         return sha1(text);
     }
 
-    static String testDigest(String password, String nonce, String created) throws NoSuchAlgorithmException {
+    static String testDigest(@SuppressWarnings("SameParameterValue") String password, String nonce, String created) throws NoSuchAlgorithmException {
         return digest(password, nonce, created);
     }
 

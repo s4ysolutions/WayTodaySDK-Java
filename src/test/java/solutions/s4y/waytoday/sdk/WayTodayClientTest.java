@@ -17,7 +17,7 @@ import static solutions.s4y.waytoday.sdk.WayTodayClientTest.Locations.getDummyLo
 
 public class WayTodayClientTest {
     static class Locations {
-        static Location dummyLocation = new Location("", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
+        final static Location dummyLocation = new Location("", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
 
         static Location getDummyLocation(String id) {
             return new Location(id, "", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
@@ -32,6 +32,7 @@ public class WayTodayClientTest {
         client = new WayTodayClient(state);
     }
 
+    @AfterEach
     public void tearDown() {
         reset(state);
     }
