@@ -77,6 +77,15 @@ class GrpcClient {
         this.provider = provider;
     }
 
+    GrpcClient(String provider) {
+        this(readStartArgument("GRPC_PRINCIPAL"),
+                readStartArgument("GRPC_PASSWORD"),
+                Boolean.parseBoolean(readStartArgument("GRPC_TLS")),
+                readStartArgument("GRPC_HOST"),
+                Integer.parseInt(readStartArgument("GRPC_PORT")),
+                provider);
+    }
+
     // TODO: diagnostics for missed values
     GrpcClient() {
         this(readStartArgument("GRPC_PRINCIPAL"),
@@ -181,7 +190,9 @@ class GrpcClient {
         try (CloseableChannel channel = channel()) {
             TrackerGrpc.TrackerBlockingStub stub = TrackerGrpc.newBlockingStub(channel.get);
             ArrayList<Location> locations = new ArrayList<>();
-            stub.getLocations(req).getItemsList().forEach(item -> locations.add(LocationGrpcBridge.fromProto(item)));
+            stub.getLocations(req).getItemsList().forEach(item ->
+                    locations.add(LocationGrpcBridge.fromProto(item))
+            );
             return locations;
         }
     }

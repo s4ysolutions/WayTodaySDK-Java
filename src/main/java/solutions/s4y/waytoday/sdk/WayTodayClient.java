@@ -182,7 +182,7 @@ public class WayTodayClient {
         if (tid.isEmpty()) return;
         if (locationsQueue.isEmpty()) return;
         // TODO: notify
-        if (isUploading.compareAndSet(false, true))
+        if (!isUploading.compareAndSet(false, true))
             return;
         isError.set(false);
         notifyUploadLocationsState();
@@ -311,5 +311,17 @@ public class WayTodayClient {
         for (IErrorsListener listener : listeners) {
             listener.onError(error);
         }
+    }
+
+    static int testGetMaxLocations() {
+        return MAX_LOCATIONS_MEMORY;
+    }
+
+    static int testGetPackSize() {
+        return PACK_SIZE;
+    }
+
+    Deque<Location> testLocationsQueue() {
+        return locationsQueue;
     }
 }
