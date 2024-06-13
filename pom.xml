@@ -6,7 +6,7 @@
 
     <groupId>solutions.s4y.waytoday</groupId>
     <artifactId>waytoday-sdk-java</artifactId>
-    <version>1.0.0-dev.3</version>
+    <version>2.0.0-alpha1</version>
     <packaging>jar</packaging>
 
     <name>WayToday Java SDK</name>

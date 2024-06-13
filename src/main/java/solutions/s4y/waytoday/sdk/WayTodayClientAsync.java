@@ -9,14 +9,11 @@ import java.util.concurrent.Future;
  * This class is asynchronous wrapper around WayTodayClient
  * It is thread safe
  */
-public class WayTodayClientAsync extends WayTodayClient{
-    final ExecutorService executor = Executors.newCachedThreadPool();
-    @SuppressWarnings("unused")
+public class WayTodayClientAsync extends WayTodayClient {
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
     public WayTodayClientAsync(IPersistedState persistedState) {
         super(persistedState);
-    }
-    WayTodayClientAsync(IPersistedState persistedState, GrpcClient grpcClient) {
-        super(persistedState, grpcClient);
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -26,5 +23,9 @@ public class WayTodayClientAsync extends WayTodayClient{
 
     public void submitUploadLocations() {
         executor.execute(this::uploadLocations);
+    }
+
+    WayTodayClientAsync(IPersistedState persistedState, GrpcClient grpcClient) {
+        super(persistedState, grpcClient);
     }
 }

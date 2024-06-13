@@ -17,10 +17,10 @@ import static solutions.s4y.waytoday.sdk.WayTodayClientTest.Locations.getDummyLo
 
 public class WayTodayClientTest {
     static class Locations {
-        final static Location dummyLocation = new Location("", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
+        final static Location dummyLocation = new Location("", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, "", 0, 0);
 
         static Location getDummyLocation(String id) {
-            return new Location(id, "", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
+            return new Location(id, "", 0, 0, 0, 0, System.currentTimeMillis(), 0, false,"",0, 0, "");
         }
     }
 
@@ -54,9 +54,9 @@ public class WayTodayClientTest {
             ITrackIdChangeListener l = trackID -> {
             };
 
-            client.addOnTrackIdChangeListener(l);
+            client.addTrackIdChangeListener(l);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(1);
-            client.removeOnTrackIdChangeListener(l);
+            client.removeTrackIdChangeListener(l);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(0);
             verify(errorsListener, never()).onError(any());
         }
@@ -69,14 +69,14 @@ public class WayTodayClientTest {
             ITrackIdChangeListener l2 = trackID -> {
             };
 
-            client.addOnTrackIdChangeListener(l1);
-            client.addOnTrackIdChangeListener(l2);
+            client.addTrackIdChangeListener(l1);
+            client.addTrackIdChangeListener(l2);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(2);
-            client.removeOnTrackIdChangeListener(l1);
+            client.removeTrackIdChangeListener(l1);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(1);
-            client.removeOnTrackIdChangeListener(l1);
+            client.removeTrackIdChangeListener(l1);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(1);
-            client.removeOnTrackIdChangeListener(l2);
+            client.removeTrackIdChangeListener(l2);
             assertThat(client.trackIdChangeListeners.size()).isEqualTo(0);
             verify(errorsListener, never()).onError(any());
         }

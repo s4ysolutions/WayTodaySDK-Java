@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 public class WayTodayClientAsyncTest {
     static class Locations {
         static Location getDummyLocation(String id) {
-            return new Location(id, "", 0, 0, 0, 0, System.currentTimeMillis(), 0, false, 0, 0);
+            return new Location(id, "", 0, 0, 0, 0, System.currentTimeMillis(), 0, false,"", 0, 0,"");
         }
 
         static List<Location> getDummyLocations(@SuppressWarnings("SameParameterValue") int count) {
@@ -118,7 +118,7 @@ public class WayTodayClientAsyncTest {
         // Arrange
         ITrackIdChangeListener listener = mock(ITrackIdChangeListener.class);
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-        client.addOnTrackIdChangeListener(listener);
+        client.addTrackIdChangeListener(listener);
         final String trackId = System.currentTimeMillis() + "";
         when(grpcClient.generateTrackerId(argThat(some -> true))).thenReturn(trackId);
         // Act

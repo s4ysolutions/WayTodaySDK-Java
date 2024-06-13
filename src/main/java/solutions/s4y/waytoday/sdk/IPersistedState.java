@@ -9,5 +9,5 @@ public interface IPersistedState {
     @Nonnull
     String getTrackerId();
     void setTrackerId(@Nonnull String trackerID);
-    boolean isTrackerIDSet();
+    boolean hasTrackerId();
 }

@@ -131,7 +131,7 @@ public class GrpcClientIntegrationTest {
             assertThat(locations0).isEmpty();
             List<Location> locations = new ArrayList<>();
             locations.add(new Location("a", "1", 1, 0, 0, 1, 0, 0, false, "test-provider-explicit", 0, 0, "sid1"));
-            locations.add(new Location("b", "2", 2, 10, 0, 2, 1, 0, false, 0, 0, "sid2"));
+            locations.add(new Location("b", "2", 2, 10, 0, 2, 1, 0, false,"", 0, 0, "sid2"));
             // Act
             Boolean ok = client.addLocations("test_locations_shouldBeAdded", locations);
             Thread.sleep(2000);

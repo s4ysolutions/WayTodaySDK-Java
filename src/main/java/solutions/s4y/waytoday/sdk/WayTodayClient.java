@@ -8,106 +8,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * The main class of the SDK providing the API to the WayToday service
- * All the calls are synchronous
- * <p>
- * The API consists of two parts:
- * 1. The methods to request and release a tracking id(trackId).
- * 2. The methods to sent locations to the WayToday service and to get the status of the uploading.
- */
 public class WayTodayClient {
     private static final AtomicBoolean isUploading = new AtomicBoolean();
     private static final AtomicBoolean isError = new AtomicBoolean();
     private final IPersistedState persistedState;
     private final GrpcClient grpcClient;
 
-    final ArrayList<IErrorsListener> errorsListeners =
-            new ArrayList<>(2);
-    final ArrayList<ITrackIdChangeListener> trackIdChangeListeners =
-            new ArrayList<>(2);
-    final List<IUploadingLocationsStatusChangeListener> uploadingLocationsStatusChangeListeners =
-            new ArrayList<>(2);
+    final ArrayList<IErrorsListener> errorsListeners = new ArrayList<>(2);
+    final ArrayList<ITrackIdChangeListener> trackIdChangeListeners = new ArrayList<>(2);
+    final List<IUploadingLocationsStatusChangeListener> uploadingLocationsStatusChangeListeners = new ArrayList<>(2);
     final Deque<Location> locationsQueue = new LinkedList<>();
     final static int MAX_LOCATIONS_MEMORY = 500;
     final static int PACK_SIZE = 16;
 
-    /**
-     * Creates an instance of the client, intended to be used in tests only.
-     *
-     * @param persistedState an implementation of {@link  IPersistedState IPersistedState} to store
-     *                       the state of the client.
-     * @param grpcClient     an implementation of GrpcClient to communicate
-     *                       with the WayToday service
-     */
-    WayTodayClient(IPersistedState persistedState, GrpcClient grpcClient) {
-        this.persistedState = persistedState;
-        this.grpcClient = grpcClient;
-    }
-
-    /**
-     * Creates an instance of the client, intended to be used in production.
-     *
-     * @param persistedState an implementation of {@link IPersistedState} to store
-     *                       the state of the client.
-     */
     public WayTodayClient(IPersistedState persistedState) {
         this(persistedState, new GrpcClient());
     }
-
-    /**
-     * Subscribes listener to the responses on the request to retrieve new track id.
-     *
-     * @param listener the implementation of  {@link ITrackIdChangeListener} to handle
-     *                 the notification
-     */
-    public void addOnTrackIdChangeListener(@Nonnull ITrackIdChangeListener listener) {
-        synchronized (trackIdChangeListeners) {
-            trackIdChangeListeners.add(listener);
-        }
-    }
-
-    /**
-     * Unsubscribes listener from the responses on the request to retrieve new track id.
-     *
-     * @param listener the implementation of {@link ITrackIdChangeListener} used
-     *                 in the previous call of {@link #addOnTrackIdChangeListener addOnTrackIdChangeListener}
-     */
-    public void removeOnTrackIdChangeListener(@Nonnull ITrackIdChangeListener listener) {
-        trackIdChangeListeners.remove(listener);
-    }
-
-    /**
-     * Subscribe the listener to changes of the uploading locations status.
-     *
-     * @param listener an implementation of {@link IUploadingLocationsStatusChangeListener}
-     */
-
-    public void addUploadingLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
-        synchronized (uploadingLocationsStatusChangeListeners) {
-            uploadingLocationsStatusChangeListeners.add(listener);
-        }
-    }
-
-
-    /**
-     * Unsubscribe the listener from changes of the uploading locations status.
-     *
-     * @param listener an implementation of {@link IUploadingLocationsStatusChangeListener}
-     *                 used in the previous call of {@link #addUploadingLocationsStatusChangeListener addUploadStatusChangeListener}
-     */
-
-    public void removeUploadingLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
-        synchronized (uploadingLocationsStatusChangeListeners) {
-            uploadingLocationsStatusChangeListeners.remove(listener);
-        }
-    }
-
-    /**
-     * Subscribe the listener to errors.
-     *
-     * @param listener an implementation of {@link IErrorsListener}
-     */
 
     public void addErrorsListener(IErrorsListener listener) {
         synchronized (errorsListeners) {
@@ -115,51 +31,18 @@ public class WayTodayClient {
         }
     }
 
-    /**
-     * Unsubscribe the listener from errors.
-     *
-     * @param listener an implementation of {@link IErrorsListener}
-     *                 used in the previous call of {@link #addErrorsListener addErrorsListener}
-     */
-
-    public void removeErrorsListener(IErrorsListener listener) {
-        synchronized (errorsListeners) {
-            errorsListeners.remove(listener);
+    public void addTrackIdChangeListener(@Nonnull ITrackIdChangeListener listener) {
+        synchronized (trackIdChangeListeners) {
+            trackIdChangeListeners.add(listener);
         }
     }
 
-    /**
-     * Requests new track id from the server synchronously.
-     *
-     * @param prevId - existing track id to be released
-     * @return new track id or empty string if the request failed
-     */
-    public String requestNewTrackerId(@Nullable String prevId) {
-        try {
-            String id = grpcClient.generateTrackerId(prevId);
-            persistedState.setTrackerId(id);
-            notifyTrackIdChange(id);
-            return id;
-        } catch (Exception e) {
-            notifyError(new WayTodayError("Error while requesting new tracker id", e));
-            return "";
+    public void addUploadingLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
+        synchronized (uploadingLocationsStatusChangeListeners) {
+            uploadingLocationsStatusChangeListeners.add(listener);
         }
     }
 
-    /**
-     * @return trackId - the track id to be released
-     */
-    @Nonnull
-    public String getCurrentTrackerId() {
-        return persistedState.getTrackerId();
-    }
-
-    /**
-     * Adds the location to the queue of the locations to be uploaded
-     * and returns immediately.
-     *
-     * @param location - a Geo location to be added to the queue
-     */
     public void enqueueLocationToUpload(Location location) {
         synchronized (locationsQueue) {
             locationsQueue.addLast(location);
@@ -170,31 +53,15 @@ public class WayTodayClient {
         notifyUploadLocationsState();
     }
 
-    /**
-     * Uploads the locations from the queue to the server synchronously.
-     */
-    public void uploadLocations() {
-        String tid = getCurrentTrackerId();
-        if (tid.isEmpty()) return;
-        if (locationsQueue.isEmpty()) return;
-        // TODO: notify
-        if (!isUploading.compareAndSet(false, true))
-            return;
-        isError.set(false);
-        notifyUploadLocationsState();
-        try {
-            uploadQueue(tid);
-        } catch (Exception e) {
-            isError.set(true);
-        } finally {
-            isUploading.set(false);
-            notifyUploadLocationsState();
-        }
+    @Nonnull
+    public String getCurrentTrackerId() {
+        return persistedState.getTrackerId();
     }
 
-    /**
-     * @return current status of the uploading locations
-     */
+    public boolean hasTrackerId() {
+        return persistedState.hasTrackerId();
+    }
+
     public UploadingLocationsStatus getUploadingLocationsStatus() {
         if (isError.get())
             return UploadingLocationsStatus.ERROR;
@@ -209,6 +76,67 @@ public class WayTodayClient {
         return UploadingLocationsStatus.EMPTY;
     }
 
+    public void removeErrorsListener(IErrorsListener listener) {
+        synchronized (errorsListeners) {
+            errorsListeners.remove(listener);
+        }
+    }
+
+    public void removeTrackIdChangeListener(@Nonnull ITrackIdChangeListener listener) {
+        trackIdChangeListeners.remove(listener);
+    }
+
+    public void removeUploadingLocationsStatusChangeListener(IUploadingLocationsStatusChangeListener listener) {
+        synchronized (uploadingLocationsStatusChangeListeners) {
+            uploadingLocationsStatusChangeListeners.remove(listener);
+        }
+    }
+
+    public String requestNewTrackerId(@Nullable String prevId) {
+        try {
+            String id = grpcClient.generateTrackerId(prevId);
+            persistedState.setTrackerId(id);
+            notifyTrackIdChange(id);
+            return id;
+        } catch (Exception e) {
+            notifyError(new WayTodayError("Error while requesting new tracker id", e));
+            return "";
+        }
+    }
+
+    public void uploadLocations() {
+        String tid = getCurrentTrackerId();
+        if (tid.isEmpty()) return;
+        if (locationsQueue.isEmpty()) return;
+        if (!isUploading.compareAndSet(false, true))
+            return;
+        isError.set(false);
+        notifyUploadLocationsState();
+        try {
+            uploadQueue(tid);
+        } catch (Exception e) {
+            isError.set(true);
+        } finally {
+            isUploading.set(false);
+            notifyUploadLocationsState();
+        }
+    }
+
+    WayTodayClient(IPersistedState persistedState, GrpcClient grpcClient) {
+        this.persistedState = persistedState;
+        this.grpcClient = grpcClient;
+    }
+
+    private void notifyError(WayTodayError error) {
+        List<IErrorsListener> listeners;
+        synchronized (errorsListeners) {
+            listeners = new ArrayList<>(errorsListeners);
+        }
+        for (IErrorsListener listener : listeners) {
+            listener.onError(error);
+        }
+    }
+
     private void notifyTrackIdChange(@Nonnull String trackId) {
         List<ITrackIdChangeListener> listeners;
         synchronized (trackIdChangeListeners) {
@@ -220,34 +148,6 @@ public class WayTodayClient {
     }
 
     private void notifyUploadLocationsState() {
-        /*
-        if (BuildConfig.DEBUG) {
-            boolean changed = false;
-            if (sIsError != sPrevIsError) {
-                sPrevIsError = sIsError;
-                changed = true;
-            }
-            if (sIsUploading != sPrevIsUploading) {
-                sPrevIsUploading = sIsUploading;
-                changed = true;
-            }
-            int size = uploadQueue.size();
-            if (size != sPrevSize) {
-                sPrevSize = size;
-                changed = true;
-            }
-            if (changed) {
-                UploadStatus uploadStatus = uploadStatus();
-                if (sPrevUploadStatus == uploadStatus) {
-                    ErrorsObservable.notify(new Exception("Status must not be the same"), true);
-                }
-                notifyUploadStatus();
-                sPrevUploadStatus = uploadStatus;
-            } else {
-                ErrorsObservable.notify(new Exception("Should never be called without changes"), true);
-            }
-        } else {
-         */
         UploadingLocationsStatus status = getUploadingLocationsStatus();
         List<IUploadingLocationsStatusChangeListener> listeners;
         synchronized (uploadingLocationsStatusChangeListeners) {
@@ -261,7 +161,6 @@ public class WayTodayClient {
     private void uploadQueue(@Nonnull final String tid) {
         List<Location> pack = new ArrayList<>();
         for (; ; ) {
-            // prepare pack
             synchronized (locationsQueue) {
                 int packSize = Math.min(locationsQueue.size(), PACK_SIZE);
                 for (int i = 0; i < packSize; i++) {
@@ -283,27 +182,15 @@ public class WayTodayClient {
                         }
                     }
                 } else {
-                    // unknown error
                     isError.set(true);
                     break;
                 }
             } catch (Exception e) {
-                // network error
                 notifyError(new WayTodayError("Error while uploading locations", e));
                 isError.set(true);
                 break;
             }
             pack.clear();
-        }
-    }
-
-    private void notifyError(WayTodayError error) {
-        List<IErrorsListener> listeners;
-        synchronized (errorsListeners) {
-            listeners = new ArrayList<>(errorsListeners);
-        }
-        for (IErrorsListener listener : listeners) {
-            listener.onError(error);
         }
     }
 }
