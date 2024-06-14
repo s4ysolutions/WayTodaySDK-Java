@@ -6,7 +6,7 @@
 
     <groupId>solutions.s4y.waytoday</groupId>
     <artifactId>waytoday-sdk-java</artifactId>
-    <version>2.0.0-alpha1</version>
+    <version>3.0.0-alpha1</version>
     <packaging>jar</packaging>
 
     <name>WayToday Java SDK</name>
@@ -90,31 +90,30 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-okhttp</artifactId>
-            <version>1.59.0</version>
+            <version>1.64.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty-shaded</artifactId>
-            <version>1.59.0</version>
+            <version>1.64.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>1.59.0</version>
+            <version>1.64.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>1.59.0</version>
+            <version>1.64.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.25.1</version>
+            <version>3.25.3</version>
         </dependency>
-        <!-- -->
         <!-- dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -147,5 +146,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

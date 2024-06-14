@@ -58,6 +58,7 @@ public class WayTodayClient {
         return persistedState.getTrackerId();
     }
 
+    @SuppressWarnings("unused")
     public boolean hasTrackerId() {
         return persistedState.hasTrackerId();
     }
@@ -92,13 +93,33 @@ public class WayTodayClient {
         }
     }
 
+    private final AtomicBoolean requestNewTrackerIdProgress = new AtomicBoolean(false);
+    private final AtomicBoolean requestNewTrackerIdFailed = new AtomicBoolean(false);
+
+    @SuppressWarnings("unused")
+    public boolean isRequestNewTrackerIdInProgress() {
+        return requestNewTrackerIdProgress.get();
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isRequestNewTrackerIdFailed() {
+        return requestNewTrackerIdFailed.get();
+    }
+
     public String requestNewTrackerId(@Nullable String prevId) {
+        if (!requestNewTrackerIdProgress.compareAndSet(false, true)) {
+            return "";
+        }
         try {
+            requestNewTrackerIdFailed.set(false);
             String id = grpcClient.generateTrackerId(prevId);
+            requestNewTrackerIdProgress.set(false);
             persistedState.setTrackerId(id);
             notifyTrackIdChange(id);
             return id;
         } catch (Exception e) {
+            requestNewTrackerIdProgress.set(false);
+            requestNewTrackerIdFailed.set(true);
             notifyError(new WayTodayError("Error while requesting new tracker id", e));
             return "";
         }
@@ -106,14 +127,17 @@ public class WayTodayClient {
 
     public void uploadLocations() {
         String tid = getCurrentTrackerId();
-        if (tid.isEmpty()) return;
-        if (locationsQueue.isEmpty()) return;
+        if (tid.isEmpty()) {
+            isError.set(true);
+            return;
+        }
         if (!isUploading.compareAndSet(false, true))
             return;
         isError.set(false);
         notifyUploadLocationsState();
         try {
             uploadQueue(tid);
+            isUploading.set(false);
         } catch (Exception e) {
             isError.set(true);
         } finally {
@@ -133,7 +157,11 @@ public class WayTodayClient {
             listeners = new ArrayList<>(errorsListeners);
         }
         for (IErrorsListener listener : listeners) {
-            listener.onError(error);
+            try {
+                listener.onError(error);
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 
@@ -143,7 +171,11 @@ public class WayTodayClient {
             listeners = new ArrayList<>(trackIdChangeListeners);
         }
         for (ITrackIdChangeListener listener : listeners) {
-            listener.onTrackId(trackId);
+            try{
+                listener.onTrackId(trackId);
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 
@@ -154,7 +186,11 @@ public class WayTodayClient {
             listeners = new ArrayList<>(uploadingLocationsStatusChangeListeners);
         }
         for (IUploadingLocationsStatusChangeListener listener : listeners) {
-            listener.onStatusChange(status);
+            try {
+                listener.onStatusChange(status);
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 
@@ -186,8 +222,8 @@ public class WayTodayClient {
                     break;
                 }
             } catch (Exception e) {
-                notifyError(new WayTodayError("Error while uploading locations", e));
                 isError.set(true);
+                notifyError(new WayTodayError("Error while uploading locations", e));
                 break;
             }
             pack.clear();
