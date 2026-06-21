@@ -3,7 +3,7 @@
 ## Versions
 
 - This SDK: `3.1.0-alpha1` (pom.xml)
-- Compatible Android SDK: [WayTodaySDK-Android](https://github.com/s4ysolutions/WayTodaySDK-Android) `4.3.0+`
+- Compatible Android SDK: [WayTodaySDK-Android](https://github.com/s4ysolutions/WayTodaySDK-Android) `4.4.0+`
 - Proto definitions: git submodule at `src/main/proto` (repo: WayTodayProtobuffers)
 
 ## Compatibility rules
