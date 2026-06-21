@@ -86,7 +86,7 @@ Full API: [`WayTodayClient.java`](src/main/java/solutions/s4y/waytoday/sdk/WayTo
 
 ## Android
 
-For Android use [WayTodaySDK-Android](https://github.com/s4ysolutions/WayTodaySDK-Android), which wraps this SDK with WorkManager-based background uploads.
+For Android use [WayTodaySDK-Android](https://github.com/s4ysolutions/WayTodaySDK-Android) 4.3.0+, which wraps this SDK with WorkManager-based background uploads.
 
 ## Build & Test
 
