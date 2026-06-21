@@ -11,6 +11,9 @@ Java client library for the [way.today](https://github.com/s4ysolutions/way-toda
 
 [![](https://jitpack.io/v/s4ysolutions/WayTodaySDK-Java.svg)](https://jitpack.io/#s4ysolutions/WayTodaySDK-Java)
 
+> JitPack builds the artifact on first request. To pre-trigger the build for a new version, open
+> `https://jitpack.io/#s4ysolutions/WayTodaySDK-Java/3.1.0-alpha1` and click **Get it**.
+
 **Maven** — add JitPack repository and dependency:
 
 ```xml
